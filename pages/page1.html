@@ -38,6 +38,9 @@
                 <a href="page3.html">Lines 'n Curves</a>
               </li>
               <li>
+                <a href="page4.html">Recur</a>
+              </li>
+              <li>
                 <a href="#">CS Classes
                   <span class="arrow">&#x25B6;</span>
                 </a>
@@ -393,75 +396,143 @@ class Lines {
       <div class="code">
         <pre>
     <code class="language-javascript">
-      var level;
-      var len;
-      
+      var pts = [];
+      var circs = [];
+      var angle = 0;
+      var angl = 0;
+      var ang2 = 0;
+      var circs2 = [];
+      var x2 = 0;
+      var y2 = 0;
+      var num = 0;
+      var rad = 180;
+      var rot = 0;
+      var w = 20;
+      var leftMouth = 0;
+      var rightMouth = 5;
+      var eyeSize = 5;
+      var cols = ["#F6412D", "#FF5607", "#FF9800", "#FFC100", "#FFEC19"];
+      var randCol;
       var buttonStart;
       function setup() {
         createCanvas(400, 400);
-      
-        len=width;
-        level=1;
-        buttonStart=createButton("reset");
-        buttonStart.mousePressed(resetGame);
+        resetIt();
+        buttonStart = createButton("reset");
+        buttonStart.mousePressed(resetIt);
       }
       
       function draw() {
         background(0);
-        fill(255, 0, 0);
-        stroke(0);
-        strokeWeight(10);
-        drawChair(len, len, level);
+        translate(width / 2, height / 2);
+        if (frameCount % 120 == 0) {
+          randCol = floor(random(cols.length));
+          console.log(randCol);
+          circs2.push(new Circles(x2, y2, ang2, rad, w, cols[randCol]));
+          ang2 += PI / 10;
+          num++;
+          if (num > 19) {
+            rad -= 20;
+            num = 0;
+          }
+        }
+        rotate(ang2 * 0.02);
+        for (var i = 0; i < 20; i++) {
+          stroke("#F6412D");
+          line(0, 0, round(pts[i].x), round(pts[i].y));
+          fill("#F6412D");
+          stroke(0);
+          ellipse(pts[i].x, pts[i].y, 20, 20);
+          fill(255);
+          textSize(14);
+          text(
+            "    " + i + "    x " + round(pts[i].x) + ",  y " + round(pts[i].y),
+            pts[i].x,
+            pts[i].y
+          );
+        }
+        for (var k = 0; k < circs2.length; k++) {
+          circs2[k].display();
+          circs2[k].move();
+        }
+        fill("#FFC100");
+        ellipse(0, 0, 40, 40);
+        ellipse(-10, -5, eyeSize, eyeSize);
+        ellipse(10, -5, 5, 5);
+        arc(leftMouth, rightMouth, 20, 10, 0, PI);
       }
-      function resetGame(){
-        level=floor(random(1, 6));
-        console.log("hello")
-        console.log(level)
+      
+      function resetIt() {
+        pts = [];
+        circs = [];
+        angle = 0;
+        angl = 0;
+        ang2 = 0;
+        circs2 = [];
+        x2 = 0;
+        y2 = 0;
+        num = 0;
+        rad = 180;
+        rot = 0;
+        w = 20;
+        leftMouth = 0;
+        rightMouth = 5;
+        eyeSize = 5;
+        cols = ["#F6412D", "#FF5607", "#FF9800", "#FFC100", "#FFEC19"];
+        for (var i = 0; i < 20; i++) {
+          var x = cos(angle) * rad;
+          var y = sin(angle) * rad;
+          angle += PI / 10;
+          pts.push(new Points(round(x), round(y), angle));
+        }
+        randCol = floor(random(cols.length));
       }
-      function drawChair(x, y, lev) {
-        if (lev==0) {
-          beginShape();
-          vertex(0, 0);
-          vertex(len, 0);
-          vertex(len, len/2);
-          vertex(len/2, len/2);
-          vertex(len/2, len);
-          vertex(0, len);
-          endShape(CLOSE);
-          
-        } else {
-          push();//red
-          translate( len, 0);
-          rotate( radians( 90 ) );
-          scale( 0.5 );
-          drawChair(x, y, lev-1);
-          pop();
-      
-          push();//green
-          translate( 0, 0);
-          rotate( radians( 0 ) );
-          scale( 0.5 );
-          // fill(0, 255, 0);
-          drawChair(x, y, lev-1);
-          pop();
-      
-          push();//blue
-          translate( 0, len);
-          rotate( radians( -90 ) );
-          scale( 0.5 );
-          //fill(0, 0, 255);
-          drawChair(x, y, lev-1);
-          pop();
-      
-          push();//white
-          translate( len/4, len/4);
-          rotate( radians( 0) );
-          scale( 0.5 );
-          ///fill(255);
-          drawChair(x, y, lev-1);
-          pop();
+      class Circles {
+        constructor(x, y, ang, rad, w, randCol) {
+          this.x = x;
+          this.y = y;
+          this.e = 0.04;
+          this.dx = 100;
+          this.dy = 100;
+          this.ang = ang;
+          this.x1 = cos(this.ang) * rad;
+          this.y1 = sin(this.ang) * rad;
+          this.w = w;
+          this.randCol = randCol;
+        }
+        display() {
+          fill(this.randCol);
+          ellipse(this.x, this.y, this.w, this.w);
+        }
+        move() {
+          this.dx = this.x1 - this.x;
+          this.dy = this.y1 - this.y;
+          if (this.x > this.dx) {
+            this.x += this.dx * this.e;
+          }
+          if (this.y > this.dy) {
+            this.y += this.dy * this.e;
+          }
+          if (this.x < this.dx) {
+            this.x += this.dx * this.e;
+          }
+          if (this.y < this.dy) {
+            this.y += this.dy * this.e;
+          }
         }
       }
+      
+      class Points {
+        constructor(x, y) {
+          this.x = x;
+          this.y = y;
+          this.vects = createVector(x, y);
+        }
+        display() {
+          stroke("#FFC100");
+          line(0, 0, this.vects.x, this.vects.y);
+        }
+      }
+      
    </code>
 
    
