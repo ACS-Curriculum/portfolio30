@@ -205,7 +205,7 @@
       </div>
       <div class="product">
         <div id="recur1">
-          <script type="module" src="../js/page4/recur1/main.js"></script>
+          <script type="module" src="../js/page4/main.js"></script>
         </div>
       </div>
       <div class="reflection">
@@ -222,82 +222,45 @@
       <div class="code">
         <pre>
     <code class="language-javascript">
-      var level;
-      var len;
-      
-      var buttonStart;
       function setup() {
         createCanvas(400, 400);
-      
-        len=width;
-        level=1;
-        buttonStart=createButton("reset");
-        buttonStart.mousePressed(resetGame);
+        fill(0);
+        noStroke();
       }
       
-      function draw() {
-        background(0);
-        fill(255, 0, 0);
-        stroke(0);
-        strokeWeight(10);
-        drawChair(len, len, level);
-      }
-      function resetGame(){
-        level=floor(random(1, 6));
-        console.log("hello")
-        console.log(level)
-      }
-      function drawChair(x, y, lev) {
-        if (lev==0) {
-          beginShape();
-          vertex(0, 0);
-          vertex(len, 0);
-          vertex(len, len/2);
-          vertex(len/2, len/2);
-          vertex(len/2, len);
-          vertex(0, len);
-          endShape(CLOSE);
-          
-        } else {
-          push();//red
-          translate( len, 0);
-          rotate( radians( 90 ) );
-          scale( 0.5 );
-          drawChair(x, y, lev-1);
+      function makeDrawing(levs) {
+        ellipse(0, 0, 150, 150);
+        if (levs > 0) {
+          push();
+          translate(130, -20);
+          rotate(map(mouseY, 0, height, 0, radians(90)));
+          scale(map(mouseX, 0, width, 0, 1));
+          makeDrawing(levs - 1);
           pop();
       
-          push();//green
-          translate( 0, 0);
-          rotate( radians( 0 ) );
-          scale( 0.5 );
-          // fill(0, 255, 0);
-          drawChair(x, y, lev-1);
-          pop();
-      
-          push();//blue
-          translate( 0, len);
-          rotate( radians( -90 ) );
-          scale( 0.5 );
-          //fill(0, 0, 255);
-          drawChair(x, y, lev-1);
-          pop();
-      
-          push();//white
-          translate( len/4, len/4);
-          rotate( radians( 0) );
-          scale( 0.5 );
-          ///fill(255);
-          drawChair(x, y, lev-1);
+          push();
+          rotate(radians(-80));
+          translate(100, -90);
+          rotate(map(mouseY, 0, height, 0, radians(90)));
+          scale(map(mouseX, 0, width, 0, 1));
+          makeDrawing(levs - 1);
           pop();
         }
       }
+      
+      function draw() {
+        background(255);
+        translate(150, 250);
+        makeDrawing(10);
+      }
+      
    </code>
 
       </pre>
       </div>
       <div class="product">
         <div id="recur2">
-          <script type="module" src="../js/page4/recur1/main.js"></script>
+          <script type="module" src="../js/page4/main.js"></script>
         </div>
       </div>
       <div class="reflection">
@@ -315,75 +278,56 @@
       <div class="code">
         <pre>
     <code class="language-javascript">
-      var level;
-      var len;
-      
       var buttonStart;
+
       function setup() {
         createCanvas(400, 400);
       
-        len=width;
-        level=1;
-        buttonStart=createButton("reset");
-        buttonStart.mousePressed(resetGame);
+        noLoop();
+        buttonStart = createButton("reset");
+        buttonStart.position(0, 400);
+        buttonStart.mousePressed(resetIt);
       }
       
       function draw() {
-        background(0);
-        fill(255, 0, 0);
-        stroke(0);
+        background(135, 206, 235);
         strokeWeight(10);
-        drawChair(len, len, level);
+        translate(width / 2, height - 20);
+        branch(2);
       }
-      function resetGame(){
-        level=floor(random(1, 6));
-        console.log("hello")
-        console.log(level)
-      }
-      function drawChair(x, y, lev) {
-        if (lev==0) {
-          beginShape();
-          vertex(0, 0);
-          vertex(len, 0);
-          vertex(len, len/2);
-          vertex(len/2, len/2);
-          vertex(len/2, len);
-          vertex(0, len);
-          endShape(CLOSE);
-          
-        } else {
-          push();//red
-          translate( len, 0);
-          rotate( radians( 90 ) );
-          scale( 0.5 );
-          drawChair(x, y, lev-1);
-          pop();
       
-          push();//green
-          translate( 0, 0);
-          rotate( radians( 0 ) );
-          scale( 0.5 );
-          // fill(0, 255, 0);
-          drawChair(x, y, lev-1);
-          pop();
+      function branch(depth) {
+        if (depth < 10) {
+          strokeWeight(2);
+          line(0, 0, 0, -height / 10); // draw a line going up
+          translate(0, -height / 10); // move the space upwards
+          //rotate(random(-0.05, 0.05)); // random wiggle
       
-          push();//blue
-          translate( 0, len);
-          rotate( radians( -90 ) );
-          scale( 0.5 );
-          //fill(0, 0, 255);
-          drawChair(x, y, lev-1);
-          pop();
+          if (random(1.0) < 0.6) {
+            // branching
+            rotate(0.3); // rotate to the right
+            scale(0.8); // scale down
       
-          push();//white
-          translate( len/4, len/4);
-          rotate( radians( 0) );
-          scale( 0.5 );
-          ///fill(255);
-          drawChair(x, y, lev-1);
-          pop();
+            push(); // now save the transform state
+            branch(depth + 1); // start a new branch!
+            pop(); // go back to saved state
+      
+            rotate(-0.6); // rotate back to the left
+      
+            push(); // save state
+            branch(depth + 1); // start a second new branch
+            pop(); // back to saved state
+          } else {
+            // no branch - continue at the same depth
+            branch(depth);
+          }
         }
       }
+      
+      function resetIt() {
+        redraw();
+      }
+      
    </code>
 
       </pre>
